@@ -39,7 +39,7 @@ const contractFunctions = {
   "0x9f37092a": "buyItem", // 2
   "0x38ed1739": "swapExactTokensForTokens", // 6
   "0x106f46e4": "consumeItem", // 1
-  "0x4c7f588f": "dfkGold", // 11 // DFK GOLD contract, not sure what function though
+  "0x4c7f588f": "petIncubation", // 11 // DFK GOLD contract, not sure what function though
   "0xad660825": "itemBridge", // 29 - Item Bridge: HAS VALUE
   "0xa9059cbb": "transfer",
   "0x": "nativeTransfer",
@@ -137,7 +137,7 @@ completeMeditation (0x756fcd69) - 0/125         ** obvious
 startQuestWithData (0xf51333f5) - 0/1148        ** obvious
 stylist (0x6e278cf1) - 0/1                      ** obvious
 startQuest (0x8a2da17b) - 0/485                 ** obvious
-crack (0xb0ea6a1b) - 0/1                        ** WHY - SHOULD GIVE PET?
+crack (0xb0ea6a1b) - 0/1                        ** WHY - SHOULD GIVE PET? These is also an incubation record in the CSV, but neither gives us the NFT
 setApprovalForAll (0xa22cb465) - 0/2            ** obvious
 
 -- Some (find and work out why)
@@ -167,7 +167,7 @@ deposit (0x90d25074) - 3/3
 sellItem (0x096c5e1a) - 17/17
 buyItem (0x9f37092a) - 1/1
 consumeItem (0x106f46e4) - 1/1
-dfkGold (0x4c7f588f) - 1/1
+petIncubate (0x4c7f588f) - 1/1
 itemBridge (0xad660825) - 29/29
 sendHero (0x1efedbe5) - 15/15
 petBridge (0xbb5e613b) - 1/1
