@@ -96,7 +96,7 @@ const getSelectorOfMissingTxs = async () => {
   console.log(distinctMissingSelector);
 };
 
-const getMissingTxsBySelector = () => {
+const getAllMissingTxsBySelector = () => {
   const csvTxHashes = [...new Set(csv.map((tx) => tx.txHash?.toLowerCase()))];
 
   const distinctSelectors = [
@@ -117,37 +117,55 @@ const getCsvWithoutTransactionHash = () => {
   console.log(wo);
 };
 
-//getSelectorOfMissingTxs();
-getDifferences();
-//getMissingTxsBySelector();
-//getCsvWithoutTransactionHash();
+const getMissingTxsBySelector = (selector) => {
+  const csvTxHashes = [...new Set(csv.map((tx) => tx.txHash?.toLowerCase()))];
+
+  const matching = txs.filter((tx) => tx.input.substr(0, 10) === selector);
+  const notInCsv = matching.filter((m) => !csvTxHashes.includes(m.ethHash));
+  const inCsv = matching.filter((m) => csvTxHashes.includes(m.ethHash));
+
+  console.log("*** NOT IN ***");
+  for (const tx of notInCsv) {
+    console.log(tx.ethHash);
+  }
+
+  console.log("*** IS IN ***");
+  for (const tx of inCsv) {
+    console.log(tx.ethHash);
+  }
+};
+
+getMissingTxsBySelector("0x5eac6239");
 
 /* TODO
 
 counts of transaction types that are included in CSV
+
 -- None (check, and need fee records for all of these)
+crack (0xb0ea6a1b) - 0/1                        ** Update receipt of pet manually in CSV in the same way as for heroes
+convertMultiple (0x303e6aa4) - 0/1              ** This is probably the banker CLAIM button - nothing transferred to me. Just put as cost
+rechargeCrystal (0x5d444f91) - 0/2              ** INCLUDE - THERE ARE JEWEL TRANSFER RECORDS
 createProfile (0xbd3eaa6f) - 0/1                ** obvious
 approve (0x095ea7b3) - 0/80                     ** obvious
 startQuest (0x68ce0b56) - 0/223                 ** obvious
-convertMultiple (0x303e6aa4) - 0/1              ** CHECK - WHY?
 open (0x690e7c09) - 0/12                        ** obvious
 startQuest (0xc855dea3) - 0/2394                ** obvious
-rechargeCrystal (0x5d444f91) - 0/2              ** CHECK - WHY?
 completeMeditation (0x756fcd69) - 0/125         ** obvious
 startQuestWithData (0xf51333f5) - 0/1148        ** obvious
 stylist (0x6e278cf1) - 0/1                      ** obvious
 startQuest (0x8a2da17b) - 0/485                 ** obvious
-crack (0xb0ea6a1b) - 0/1                        ** WHY - SHOULD GIVE PET? These is also an incubation record in the CSV, but neither gives us the NFT
 setApprovalForAll (0xa22cb465) - 0/2            ** obvious
 
+
 -- Some (find and work out why)
-nativeTransfer (0x) - 9/10
+nativeTransfer (0x) - 9/10                      ** Zero value tx, just record fee
+claimRewards (0x5eac6239) - 74/86               ** No transfers, so just record fee
+deposit (0x8dbdbe6d) - 2/3                      ** No transfers, so just record fee
 completeQuest (0x528be0a9) - 3411/4332          ** Those with no rewards (just need fee record?)
-deposit (0x8dbdbe6d) - 2/3
-claimRewards (0x5eac6239) - 74/86
-startMeditation (0xfa863736) - 105/107
+startMeditation (0xfa863736) - 105/107          ** No transfers, so just record fee
 cancelQuest (0xfe90ff7d) - 12/30                ** Those with no rewards  (just need fee record?)
-swapExactTokensForTokens (0x38ed1739) - 3/5
+swapExactTokensForTokens (0x38ed1739) - 3/5     ** Missing 2 have no transfer records, so just add fee
+
 
 -- All (spot checks)
 swapExactETHForTokens (0x7ff36ab5) - 6/6
@@ -171,4 +189,11 @@ petIncubate (0x4c7f588f) - 1/1
 itemBridge (0xad660825) - 29/29
 sendHero (0x1efedbe5) - 15/15
 petBridge (0xbb5e613b) - 1/1
+
+ALL SWAPS ARE ALMOST DEFINITELY MISCATEGORISED (although actually, logged as descriptions not labels)
+ - Just review all descriptions
+
+ Really need to report locked JEWEL? or only when claim?
+
+ UPDATE FOR RECEIPT OF NFTS - summon, purchase, pet crack
 */
