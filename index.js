@@ -45,6 +45,41 @@ const contractFunctions = {
   "0x": "nativeTransfer",
 };
 
+const tokenMap = {
+  Ambertaffy: "NULL1",
+  "Atonement Crystal Lesser": "NULL2",
+  Bloater: "NULL3",
+  "Blue Pet Egg": "NULL4",
+  "Blue Stem": "NULL5",
+  Darkweed: "NULL6",
+  "DFK Gold": "NULL7",
+  "Gaia's Tears": "NULL8",
+  "Golden Egg": "NULL9",
+  Goldvein: "NULL10",
+  "Green Pet Egg": "NULL11",
+  "Grey Pet Egg": "NULL12",
+  "Health Vial": "NULL13",
+  Ironscale: "NULL14",
+  Jewel: "ID:108585",
+  "Jewel LP Token ONE/Jewel": "NULL15",
+  Lanterneye: "NULL16",
+  "Mana Vial": "NULL17",
+  Milkweed: "NULL18",
+  ONE: "ID:3766",
+  Ragweed: "NULL19",
+  Redgill: "NULL20",
+  Redleaf: "NULL21",
+  Rockroot: "NULL22",
+  Sailfish: "NULL23",
+  Shimmerskin: "NULL24",
+  "Shvas Rune": "NULL25",
+  Silverfin: "NULL26",
+  Spiderfruit: "NULL27",
+  "Stamina Vial": "NULL28",
+  SwiftThistle: "NULL29",
+  xJewel: "ID:3431761",
+};
+
 const rawTxs = fs.readFileSync(`./data/txs-rcpt.json`);
 const txs = JSON.parse(rawTxs);
 const csv = [];
@@ -135,9 +170,55 @@ const getMissingTxsBySelector = (selector) => {
   }
 };
 
-getMissingTxsBySelector("0x5eac6239");
+const updateCsvWithNullForUnknownTokens = () => {
+  for (const line of csv) {
+    const origSentCur = line.sentCur;
+    const newSentCur = tokenMap[origSentCur];
+    if (newSentCur) {
+      line.sentCur = newSentCur;
+      line.description = `${line.description} - (sent ${origSentCur})`;
+    }
+    const origReceivedCur = line.receivedCur;
+    const newReceivedCur = tokenMap[origReceivedCur];
+    if (newReceivedCur) {
+      line.receivedCur = newReceivedCur;
+      line.description = `${line.description} - (received ${origReceivedCur})`;
+    }
+  }
+
+  /*
+    timestamp: fields[0],
+    sentAmt: fields[1],
+    sentCur: fields[2],
+    receivedAmt: fields[3],
+    receivedCur: fields[4],
+    feeAmt: fields[5],
+    feeCur: fields[6],
+    netWorthAmt: fields[7],
+    netWorthCur: fields[8],
+    label: fields[9],
+    description: fields[10],
+    txHash: fields[11],
+*/
+
+  const data = [];
+  data.push(
+    "Date,Sent Amount,Sent Currency,Received Amount,Received Currency,Fee Amount,Fee Currency,Net Worth Amount,Net Worth Currency,Label,Description,TxHash"
+  );
+  for (const tx of csv) {
+    data.push(
+      `${tx.timestamp},${tx.receivedAmt},${tx.receivedCur},${tx.sentAmt},${tx.sentCur},${tx.feeAmt},${tx.feeCur},${tx.netWorthAmt},${tx.netWorthCur},${tx.label},${tx.description},${tx.txHash}`
+    );
+  }
+  fs.writeFileSync("./data/dfk-report-fix-currencies.csv", data.join("\r\n"));
+};
+
+updateCsvWithNullForUnknownTokens();
 
 /* TODO
+
+*** CHECK THAT THE CSV UPDATED WITH CURRENCIES CORRECTLY! ***
+
 
 counts of transaction types that are included in CSV
 
@@ -196,4 +277,6 @@ ALL SWAPS ARE ALMOST DEFINITELY MISCATEGORISED (although actually, logged as des
  Really need to report locked JEWEL? or only when claim?
 
  UPDATE FOR RECEIPT OF NFTS - summon, purchase, pet crack
+  - hmm. heroes received e.g. - 0x270d21ceaf75596acefcc96dda863bab16c070eae4479c448088fcdf4be72e5c
+  
 */
