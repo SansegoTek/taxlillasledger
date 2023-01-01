@@ -209,10 +209,32 @@ const updateCsvWithNullForUnknownTokens = () => {
   );
   for (const tx of csv) {
     data.push(
-      `${tx.timestamp},${tx.receivedAmt},${tx.receivedCur},${tx.sentAmt},${tx.sentCur},${tx.feeAmt},${tx.feeCur},${tx.netWorthAmt},${tx.netWorthCur},${tx.label},${tx.description},${tx.txHash}`
+      `${tx.timestamp},${tx.sentAmt},${tx.sentCur},${tx.receivedAmt},${tx.receivedCur},${tx.feeAmt},${tx.feeCur},${tx.netWorthAmt},${tx.netWorthCur},${tx.label},${tx.description},${tx.txHash}`
     );
   }
   fs.writeFileSync("./data/dfk-report-fix-currencies.csv", data.join("\r\n"));
+};
+
+const findDuplicates = () => {
+  const map = new Map();
+  for (const line of csv) {
+    theKeyObj = {
+      ...line,
+      label: "",
+      description: "",
+      feeAmt: "",
+    }; // JSON.stringify(line);
+    theKey = JSON.stringify(theKeyObj);
+    if (!map.has(theKey)) {
+      map.set(theKey, 1);
+    } else {
+      map.set(theKey, map.get(theKey) + 1);
+    }
+  }
+
+  for (const thing of map) {
+    if (thing[1] > 1) console.log(`${thing[0]} - ${thing[1]}`);
+  }
 };
 
 updateCsvWithNullForUnknownTokens();
@@ -225,9 +247,9 @@ updateCsvWithNullForUnknownTokens();
 counts of transaction types that are included in CSV
 
 -- None (check, and need fee records for all of these)
-crack (0xb0ea6a1b) - 0/1                        ** Update receipt of pet manually in CSV in the same way as for heroes
-convertMultiple (0x303e6aa4) - 0/1              ** This is probably the banker CLAIM button - nothing transferred to me. Just put as cost
+crack (0xb0ea6a1b) - 0/1                        ** Think this needs deeper look, missing costs eg. gold - Update receipt of pet manually in CSV in the same way as for heroes
 rechargeCrystal (0x5d444f91) - 0/2              ** INCLUDE - THERE ARE JEWEL TRANSFER RECORDS
+convertMultiple (0x303e6aa4) - 0/1              ** This is probably the banker CLAIM button - nothing transferred to me. Just put as cost
 createProfile (0xbd3eaa6f) - 0/1                ** obvious
 approve (0x095ea7b3) - 0/80                     ** obvious
 startQuest (0x68ce0b56) - 0/223                 ** obvious
@@ -251,9 +273,9 @@ swapExactTokensForTokens (0x38ed1739) - 3/5     ** Missing 2 have no transfer re
 
 
 -- All (spot checks)
-swapExactETHForTokens (0x7ff36ab5) - 6/6
-enter (0xa59f3e0c) - 123/123
-leave (0x67dfd4c9) - 29/29
+swapExactETHForTokens (0x7ff36ab5) - 6/6        ** Look fine
+enter (0xa59f3e0c) - 123/123                    ** Look fine
+leave (0x67dfd4c9) - 29/29                      ** Look fine
 bid (0x598647f8) - 7/7
 addLiquidityETH (0xf305d719) - 2/2
 summonCrystal (0x4ea8a311) - 8/8
@@ -281,4 +303,8 @@ ALL SWAPS ARE ALMOST DEFINITELY MISCATEGORISED (although actually, logged as des
  UPDATE FOR RECEIPT OF NFTS - summon, purchase, pet crack
   - hmm. heroes received e.g. - 0x270d21ceaf75596acefcc96dda863bab16c070eae4479c448088fcdf4be72e5c
   
+Find the 14 duplicates
+
+Might need to set fees back to ONE so that balances add up
+
 */
