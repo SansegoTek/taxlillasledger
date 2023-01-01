@@ -78,6 +78,14 @@ const tokenMap = {
   "Stamina Vial": "NULL28",
   SwiftThistle: "NULL29",
   xJewel: "ID:3431761",
+
+  "NFT hero 32898": "NFT1",
+  "NFT hero 30179": "NFT2",
+  "NFT hero 24170": "NFT3",
+  "NFT hero 30532": "NFT4",
+  "NFT hero 36323": "NFT5",
+  "NFT hero 38662": "NFT6",
+  "NFT hero 44341": "NFT7",
 };
 
 const rawTxs = fs.readFileSync(`./data/txs-rcpt.json`);
@@ -184,22 +192,16 @@ const updateCsvWithNullForUnknownTokens = () => {
       line.receivedCur = newReceivedCur;
       line.description = `${line.description} - (received ${origReceivedCur})`;
     }
+    if (
+      (line.receivedAmt === "0" || line.receivedAmt === "") &&
+      (line.sentAmt === "0" || line.sentAmt === "")
+    ) {
+      line.sentAmt = line.feeAmt;
+      line.sentCur = line.feeCur;
+      line.feeAmt = "";
+      line.feeCur = "";
+    }
   }
-
-  /*
-    timestamp: fields[0],
-    sentAmt: fields[1],
-    sentCur: fields[2],
-    receivedAmt: fields[3],
-    receivedCur: fields[4],
-    feeAmt: fields[5],
-    feeCur: fields[6],
-    netWorthAmt: fields[7],
-    netWorthCur: fields[8],
-    label: fields[9],
-    description: fields[10],
-    txHash: fields[11],
-*/
 
   const data = [];
   data.push(
